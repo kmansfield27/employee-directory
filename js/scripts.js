@@ -16,13 +16,18 @@ const printEmployeeCards = (employees) => {
                             </div>`;
         gallery.appendChild(card);
 
+        card.addEventListener('click', () => {
+            showEmployeeModal(employee);
+        });
+
     });
 }
 
 
+
+
 const printSearch = () => {
     const container = document.querySelector('.search-container');
-    console.log(container);
     const form = document.createElement('form');
     form.setAttribute('action', '#');
     form.setAttribute('method', 'get');
@@ -50,7 +55,7 @@ const showEmployeeModal = (employee) => {
                                 <p class="modal-text">${employee.email}</p>
                                 <p class="modal-text cap">${employee.location.city}</p>
                                 <hr>
-                                <p class="modal-text">${employee.phone}</p>
+                                <p class="modal-text">${employee.cell}</p>
                                 <p class="modal-text">${employee.location.street.number} ${employee.location.street.name}, ${employee.location.city}, ${employee.location.state} ${employee.location.street.zip}</p>
                                 <p class="modal-text">123 Portland Ave., Portland, OR 97204</p>
                                 <p class="modal-text">Birthday: 10/21/2015</p>
@@ -58,49 +63,23 @@ const showEmployeeModal = (employee) => {
                         </div>`;
 
     body.appendChild(modal);
+
+    const closeBtn = document.querySelector('.modal-close-btn');
+    closeBtn.addEventListener('click', () => {
+        modal.remove();
+    });
 }
-
-
-
-
-
-
-/* getEmployees.onreadystatechange = () => {
-
-    if (getEmployees.readyState === 4) {
-        const response = JSON.parse(getEmployees.responseText);
-        const employees = response.results;
-
-        console.log(response);
-        console.log(employees);
-
-        employees.forEach( employee => {
-            printEmployeeCard(employee);
-
-
-        });
-
-
-    }
-}
-
-getEmployees.open('GET', 'https://randomuser.me/api/?results=12&nat=us');
-
-getEmployees.send(); */
 
 
 function getEmployees() {
-
     return new Promise( (resolve, reject)  => {
         const xhr = new XMLHttpRequest();
         xhr.open('GET', 'https://randomuser.me/api/?results=12&nat=us');
         xhr.onload = () => {
             const response = JSON.parse(xhr.responseText);
             const employees = response.results;
-
             resolve(employees);
         }
-
         xhr.onerror = () => reject( Error('An error has occurred') );
         xhr.send();
     });
@@ -108,10 +87,11 @@ function getEmployees() {
 
 
 function generateHTML() {
-
     getEmployees()
         .then(printEmployeeCards)
         .then(printSearch);
 }
 
 generateHTML();
+
+
