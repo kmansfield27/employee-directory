@@ -1,32 +1,71 @@
-const printEmployeeCards = (employees) => {
-    const gallery = document.getElementById('gallery');
 
-    employees.forEach( employee => {
+// *********************************************
+// AJAX Request
+// *********************************************
 
-        const card = document.createElement('div');
-        card.innerHTML =   `<div class="card">
-                                <div class="card-img-container">
-                                    <img class="card-img" src="${employee.picture.large}" alt="profile picture">
-                                </div>
-                                <div class="card-info-container">
-                                    <h3 id="name" class="card-name cap">${employee.name.first} ${employee.name.last}</h3>
-                                    <p class="card-text">${employee.email}</p>
-                                    <p class="card-text cap">${employee.location.city}</p>
-                                </div>
-                            </div>`;
-        gallery.appendChild(card);
-
-        card.addEventListener('click', () => {
-            showEmployeeModal(employee);
-        });
-
+/**
+ * Gets a list of 12 employees from random user API.
+ * Results count is passed into the URL as an argument.
+ * I also added nation just to experiment with adding a second parameter.
+ * AJAX response JSON data is parsed and passed in to the resolved state.
+ */
+function getEmployees() {
+    return new Promise( (resolve, reject)  => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'https://randomuser.me/api/?results=12&nat=us');
+        xhr.onload = () => {
+            const response = JSON.parse(xhr.responseText);
+            const employees = response.results;
+            resolve(employees);
+        }
+        xhr.onerror = () => reject( Error('An error has occurred') );
+        xhr.send();
     });
 }
 
 
 
+// *********************************************
+// Chain Functions
+// *********************************************
 
-const printSearch = () => {
+/**
+ * Create the employee cards to screen for all the returned employees.
+ * Employees will be passed to the function through the resolved Promise.
+ * 
+ * Loop over each employee in the data set and build markup for card.
+ * Append card to gallery.
+ * Add event listener for modal click to each card.
+ */ 
+const createEmployeeCards = (employees) => {
+    const gallery = document.getElementById('gallery');
+
+    employees.forEach( employee => {
+
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.innerHTML =   `<div class="card-img-container">
+                                <img class="card-img" src="${employee.picture.large}" alt="profile picture">
+                            </div>
+                            <div class="card-info-container">
+                                <h3 id="name" class="card-name cap">${employee.name.first} ${employee.name.last}</h3>
+                                <p class="card-text">${employee.email}</p>
+                                <p class="card-text cap">${employee.location.city}</p>
+                            </div>`;
+                                
+        gallery.appendChild(card);
+
+        card.addEventListener('click', () => {
+            showEmployeeModal(employee);
+        });
+    });
+}
+
+
+/**
+ * Create the search bar and append to the search container div.
+ */ 
+const createSearch = () => {
     const container = document.querySelector('.search-container');
     const form = document.createElement('form');
     form.setAttribute('action', '#');
@@ -36,14 +75,22 @@ const printSearch = () => {
                       <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit"></input>`;
 
     container.appendChild(form);
-
 }
 
 
 
+// *********************************************
+// Event callbacks
+// *********************************************
+
+/**
+ * Show the employee modal.
+ */ 
+
 const showEmployeeModal = (employee) => {
     const body = document.querySelector('body');
-    const modal = document.createElement('div');
+
+    // Bindings to format cell number and date of birth
     const cell = employee.cell;
     const formattedCell = cell.replace("-", " ");
     const dob = employee.dob.date;
@@ -51,11 +98,9 @@ const showEmployeeModal = (employee) => {
     const dob_month = dob.substring(5,7);
     const dob_day = dob.substring(8,10);
 
-    console.log(cell);
-    cell.replace(/-/, ' ');
-    console.log(cell);
+    // Build modal
+    const modal = document.createElement('div');
     modal.classList.add('modal-container');
-
     modal.innerHTML = ` <div class="modal">
                             <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
                             <div class="modal-info-container">
@@ -69,38 +114,24 @@ const showEmployeeModal = (employee) => {
                                 <p class="modal-text">Birthday: ${dob_month}/${dob_day}/${dob_year}</p>
                             </div>
                         </div>`;
-
     body.appendChild(modal);
-
+    
+    // Close modal on click of close button
     const closeBtn = document.querySelector('.modal-close-btn');
     closeBtn.addEventListener('click', () => {
         modal.remove();
     });
 }
 
+// *********************************************
+// Initialize promise and chain then statements.
+// *********************************************
 
-function getEmployees() {
-    return new Promise( (resolve, reject)  => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', 'https://randomuser.me/api/?results=12&nat=us');
-        xhr.onload = () => {
-            const response = JSON.parse(xhr.responseText);
-            const employees = response.results;
-            console.log(employees);
-            resolve(employees);
-        }
-        xhr.onerror = () => reject( Error('An error has occurred') );
-        xhr.send();
-    });
-}
+getEmployees()
+    .then(createEmployeeCards)
+    .then(createSearch);
 
 
-function generateHTML() {
-    getEmployees()
-        .then(printEmployeeCards)
-        .then(printSearch);
-}
 
-generateHTML();
 
 
