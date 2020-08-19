@@ -44,7 +44,16 @@ const printSearch = () => {
 const showEmployeeModal = (employee) => {
     const body = document.querySelector('body');
     const modal = document.createElement('div');
+    const cell = employee.cell;
+    const formattedCell = cell.replace("-", " ");
+    const dob = employee.dob.date;
+    const dob_year = dob.substring(0,4);
+    const dob_month = dob.substring(5,7);
+    const dob_day = dob.substring(8,10);
 
+    console.log(cell);
+    cell.replace(/-/, ' ');
+    console.log(cell);
     modal.classList.add('modal-container');
 
     modal.innerHTML = ` <div class="modal">
@@ -55,10 +64,9 @@ const showEmployeeModal = (employee) => {
                                 <p class="modal-text">${employee.email}</p>
                                 <p class="modal-text cap">${employee.location.city}</p>
                                 <hr>
-                                <p class="modal-text">${employee.cell}</p>
+                                <p class="modal-text">${formattedCell}</p>
                                 <p class="modal-text">${employee.location.street.number} ${employee.location.street.name}, ${employee.location.city}, ${employee.location.state} ${employee.location.street.zip}</p>
-                                <p class="modal-text">123 Portland Ave., Portland, OR 97204</p>
-                                <p class="modal-text">Birthday: 10/21/2015</p>
+                                <p class="modal-text">Birthday: ${dob_month}/${dob_day}/${dob_year}</p>
                             </div>
                         </div>`;
 
@@ -78,6 +86,7 @@ function getEmployees() {
         xhr.onload = () => {
             const response = JSON.parse(xhr.responseText);
             const employees = response.results;
+            console.log(employees);
             resolve(employees);
         }
         xhr.onerror = () => reject( Error('An error has occurred') );
