@@ -110,7 +110,7 @@ const showEmployeeModal = (employee) => {
                                 <p class="modal-text cap">${employee.location.city}</p>
                                 <hr>
                                 <p class="modal-text">${formattedCell}</p>
-                                <p class="modal-text">${employee.location.street.number} ${employee.location.street.name}, ${employee.location.city}, ${employee.location.state} ${employee.location.street.zip}</p>
+                                <p class="modal-text">${employee.location.street.number} ${employee.location.street.name}, ${employee.location.city}, ${employee.location.state} ${employee.location.postcode}</p>
                                 <p class="modal-text">Birthday: ${dob_month}/${dob_day}/${dob_year}</p>
                             </div>
                         </div>`;
